@@ -1,12 +1,35 @@
-# Canlı demo · 6 dakika
+# Demo örnekleri
 
-| Süre | Ekranda göster | Anlatım |
-|---|---|---|
-| 0:00–0:45 | `belge.txt` | “Hazır modellerle yazılım kulübünün belgesinden cevap veren yerel bir asistan geliştirdim. Belge toplantı, aidat ve kayıt bilgisi içeriyor.” |
-| 0:45–1:30 | `embedding_arama.py` içinde arama ve kaynak seçimi | “MiniLM soruyu ve paragrafları vektörlere çeviriyor. Python, benzerlik puanına göre ilk iki paragrafı Gemma'ya veriyor.” |
-| 1:30–3:00 | Aidat sorusunun önce ve sonra çıktısı | “İki çalıştırmada da aynı soru ve aynı model var. İkinci istekte belgeden alınan pasajlar da var.” İkinci cevaptaki tutarı ve etiketi terminaldeki kaynakla doğrula. |
-| 3:00–4:00 | “Toplantı hangi sınıfta yapılıyor?” | İlgili paragrafı ve B204 cevabını göster. |
-| 4:00–5:00 | “Kulüp başkanının adı nedir?” | Belgeyi kontrol et ve modelin kaynak yetersizliğine nasıl cevap verdiğini göster. Beklenen cevap “Bu bilgi verilen kaynaklarda bulunmuyor.” |
-| 5:00–6:00 | Makale özeti ve kapanış | “Makale arama kalitesi ile cevabın kaynağa sadakatini ayrı değerlendiriyor. Aidat örneğinde ikisini de terminalden kontrol edebiliyoruz.” |
+Bu örnekler repodaki üç paragraflık `belge.txt` için hazırlanmıştır. Her çalıştırmada bulunan kaynaklar ve cevap terminalde gösterilir.
 
-İlk model indirmelerini ve karşılaştırma çalıştırmasını sunumdan önce tamamla. Sunumda aynı terminal çıktısını hazır tut. Aidat sorusunu `--karsilastir` ile, diğer örnekleri normal modda çalıştır.
+## 1. Kaynaksız ve kaynaklı cevap
+
+```powershell
+.\.venv\Scripts\python.exe .\embedding_arama.py --karsilastir --soru "Üyelik için ne kadar ödemem gerekiyor?"
+```
+
+Kayıtlı denemede kaynak verilmeyen istek bilgi yetersizliği belirtmiştir. Kaynaklı cevap aylık 60 TL bilgisini `[S2]` etiketiyle vermiştir. Tam çıktı ve değerlendirme [KARSILASTIRMA.md](KARSILASTIRMA.md) dosyasındadır.
+
+## 2. Belgede bulunan başka bir bilgi
+
+```powershell
+.\.venv\Scripts\python.exe .\embedding_arama.py --soru "Toplantı hangi sınıfta yapılıyor?"
+```
+
+Belgede toplantı yeri B204 olarak belirtilmiştir. Kontrol edilecek noktalar, toplantı paragrafının seçilmesi ve cevabın B204 bilgisini destekleyen kaynak etiketiyle vermesidir. Bu örnek için repoda kayıtlı bir çalıştırma çıktısı yoktur.
+
+## 3. Belgede bulunmayan bilgi
+
+```powershell
+.\.venv\Scripts\python.exe .\embedding_arama.py --soru "Kulüp başkanının adı nedir?"
+```
+
+Belgede başkan adı bulunmaz. Talimata göre beklenen cevap:
+
+> Bu bilgi verilen kaynaklarda bulunmuyor.
+
+Bu, beklenen davranıştır; modelin her çalıştırmada buna uyacağı garanti değildir. Bu örnek için repoda kayıtlı bir çalıştırma çıktısı yoktur. Arama benzerlik eşiği kullanmadığından bu soruda da pasaj gönderilir.
+
+## Demo değerlendirmesi
+
+Arama başarısı ve cevap üretimi ayrı kontrol edilir: önce gerekli bilginin seçilen kaynaklarda bulunup bulunmadığına, ardından cevabın bu kaynaklarla uyumuna bakılır. Bir kaynak etiketi bulunması tek başına cevabın doğru olduğunu göstermez.

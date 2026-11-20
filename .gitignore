@@ -1,0 +1,8 @@
+# Python ortamı ve derleme önbelleği
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Belgeden yeniden oluşturulabilen vektör önbelleği
+belge_vektorleri.npz

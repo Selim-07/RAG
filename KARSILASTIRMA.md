@@ -1,26 +1,35 @@
-# RAG öncesi ve sonrası · Üyelik aidatı
+# Kaynaksız ve kaynaklı cevap karşılaştırması
 
-**Soru:** Üyelik için ne kadar ödemem gerekiyor?  
-**Model:** `gemma3:4b`  
-**Belgedeki doğru bilgi:** Kulüp aidatı aylık 60 TL'dir.
+## Deney düzeni
 
-## İlk gözlem · Gemma'ya doğrudan soruldu
+- **Soru:** Üyelik için ne kadar ödemem gerekiyor?
+- **Cevap modeli:** `gemma3:4b`
+- **Belgedeki bilgi:** Kulüp aidatı aylık 60 TL'dir.
+- **Ayar:** Her iki istekte `temperature=0`.
+- **Karşılaştırma:** Aynı soru ve talimat şablonu kullanılır. İlk isteğin kaynak alanı boştur; ikinci isteğe bulunan iki pasaj eklenir.
 
-> Üyelik ücreti, türüne bağlı olarak değişir.  
-> **Yıllık üyelik:** 1.500 TL  
-> **Aylık üyelik:** 60 TL  
-> Üyelik türüne göre daha fazla ayrıntı ve ek bilgiler için lütfen [buraya tıklayın](https://www.turkastro.com/uyelik).
+Tam kayıt [karsilastirma-ciktisi.txt](karsilastirma-ciktisi.txt) dosyasındadır. Tekrarlama komutu [README.md](README.md) içindedir.
 
-Model bu çalıştırmada kulüp belgesini görmedi. 60 TL tutarı belgeyle örtüşüyor. Yıllık ücret ve bağlantı kulüp belgesinde geçmiyor.
+## Kayıtlı sonuçlar
 
-## Eş koşullarda karşılaştırma
+### Belgeden pasaj verilmeyen cevap
 
-README'deki `--karsilastir` komutuyla iki gerçek yanıtı `karsilastirma-ciktisi.txt` dosyasına kaydet. Bu komut önceki doğrudan sorgudan farklı olarak iki isteğe de aynı kaynak kullanma talimatını verir.
+> Bu bilgi verilen kaynaklarda bulunmuyor.
 
-Çıktıları üç gözlemle değerlendir:
+Bu istekte de yalnızca kaynaklara dayanma talimatı vardır. Dolayısıyla sonuç, modelin genel bilgisini ölçen serbest bir sohbet denemesi değildir.
 
-1. Arama, aidat bilgisini içeren paragrafı buldu mu?
-2. Kaynaklı cevap aylık 60 TL dedi mi?
-3. Cevabın sonundaki etiket gerçekten aidat paragrafına mı gidiyor?
+### Kaynaklı istekte gönderilen pasajlar
 
-Kaynaklı çıktı için beklenen örnek “Kulüp aidatı aylık 60 TL'dir. [S2]”. Pasaj sırasına göre etiket değişebilir. Teslimde terminalin ürettiği gerçek yanıtı kullan.
+> [S1] Yeni üyeler kayıt formunu doldurduktan sonra ilk toplantıya katılabilir.
+>
+> [S2] Kulüp aidatı aylık 60 TL'dir. Ödemeler her ayın ilk haftasında alınır.
+
+### Kaynaklı cevap
+
+> Üyelik için aylık 60 TL ödemeniz gerekiyor. [S2]
+
+## Değerlendirme
+
+Bu denemede arama, aidat bilgisini içeren paragrafı ilk iki sonuç arasına almıştır. Üretilen cevap aylık 60 TL bilgisini korumuş ve bunu destekleyen `[S2]` kaynağını göstermiştir.
+
+Bu kayıt, kaynak eklemenin bu sorudaki etkisini gösterir. Tek bir deneme, sistemin her soruda doğru cevap verdiğini veya bilgi eksikliğini her zaman doğru belirlediğini kanıtlamaz. Farklı ifadeler, belgede cevabı olmayan sorular ve belge güncellemeleri ayrıca test edilmelidir.
