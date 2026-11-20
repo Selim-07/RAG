@@ -1,31 +1,26 @@
-import argparse
 import json
 from pathlib import Path
 from urllib.request import Request, urlopen
-
 from sentence_transformers import SentenceTransformer
-
+from hashlib import sha256
+import numpy as np
 
 belge_yolu = Path(__file__).with_name("belge.txt")
 metin = belge_yolu.read_text(encoding="utf-8")
 pasajlar = metin.strip().split("\n\n")
 
 top_k = 2
-parser = argparse.ArgumentParser(description="Yazılım kulübü belge asistanı")
-parser.add_argument("--soru", help="Soruyu terminalden etkileşimsiz al.")
-parser.add_argument("--karsilastir", action="store_true", help="Aynı soruyu belgesiz de çalıştır.")
-ayarlar = parser.parse_args()
-soru = ayarlar.soru if ayarlar.soru is not None else input("Sorunu yaz: ")
+soru = input("Sorunu yaz: ")
+
+karsilastir = input(
+    "Aynı soruyu belgesiz de çalıştırmak ister misin? (e/h): "
+).strip().lower() == "e"
 
 # 1. Soruyla ilgili pasajları bul.
 model = SentenceTransformer(
-    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-    device="cpu",
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
 soru_vektoru = model.encode([soru])
-from hashlib import sha256
-
-import numpy as np
 
 vektor_dosyasi = belge_yolu.with_name("belge_vektorleri.npz")
 belge_izi = sha256(metin.encode("utf-8")).hexdigest()
@@ -80,7 +75,7 @@ def ollama_cevapla(prompt):
         "prompt": prompt,
         "stream": False,
     }
-    if ayarlar.karsilastir:
+    if karsilastir:
         istek_verisi["options"] = {"temperature": 0}
     istek = Request(
         "http://127.0.0.1:11434/api/generate",
@@ -93,7 +88,7 @@ def ollama_cevapla(prompt):
     return sonuc["response"].strip()
 
 
-if ayarlar.karsilastir:
+if karsilastir:
     print(f"\nSoru\n{soru}")
     print("\nRAG öncesi | Belgeden pasaj verilmedi", flush=True)
     print(ollama_cevapla(prompt_sablonu.format(baglam="", soru=soru)))
@@ -101,4 +96,4 @@ if ayarlar.karsilastir:
 print(f"\nModele verilen kaynaklar\n\n{baglam}")
 print("\nCevap hazırlanıyor...", flush=True)
 cevap = ollama_cevapla(prompt_sablonu.format(baglam=baglam, soru=soru))
-print(f"\n{'RAG sonrası | Cevap' if ayarlar.karsilastir else 'Cevap'}\n{cevap}")
+print(f"\n{'RAG sonrası | Cevap' if karsilastir else 'Cevap'}\n{cevap}") 
